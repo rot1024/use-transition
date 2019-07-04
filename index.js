@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 
-const useTransition = opts => {
-  const [onoff, toggleOnOff] = useState(!!opts.initialOnOff);
+export const useTransition = (isActive, timeout, opts) => {
   const [state, setState] = useState(
-    onoff ? "entered" : opts.mountOnEnter ? "unmounted" : "exited"
+    isActive ? "entered" : opts && opts.mountOnEnter ? "unmounted" : "exited"
   );
-  const timeout = useRef();
+  const timeoutRef = useRef();
   const startedAt = useRef();
 
   const timeout1 = useCallback(() => {
-    setState(onoff ? "entered" : opts.unmountOnExit ? "unmounted" : "exited");
+    setState(
+      isActive ? "entered" : opts && opts.unmountOnExit ? "unmounted" : "exited"
+    );
     startedAt.current = undefined;
-  }, [onoff, startedAt.current]);
+  }, [isActive, startedAt.current]);
 
   const timeout2 = useCallback(() => {
     setState("entered");
@@ -19,19 +20,23 @@ const useTransition = opts => {
   }, [startedAt.current]);
 
   const timeout3 = useCallback(() => {
-    setState(onoff ? "entered" : opts.unmountOnExit ? "unmounted" : "exited");
+    setState(
+      isActive ? "entered" : opts && opts.unmountOnExit ? "unmounted" : "exited"
+    );
     startedAt.current = undefined;
-  }, [onoff, opts.unmountOnExit]);
+  }, [isActive, !!opts && opts.unmountOnExit]);
 
   const timeout4 = useCallback(() => {
-    setState(onoff ? "entering" : "exiting");
-    timeout.current = setTimeout(timeout3, opts.timeout);
+    setState(isActive ? "entering" : "exiting");
+    timeoutRef.current = setTimeout(timeout3, timeout);
     startedAt.current = Date.now();
-  }, [onoff, opts.timeout, timeout3]);
+  }, [isActive, timeout, timeout3]);
 
   useEffect(() => {
     if (
-      onoff ? state === "entered" : state === "exited" || state === "unmounted"
+      isActive
+        ? state === "entered"
+        : state === "exited" || state === "unmounted"
     ) {
       startedAt.current = undefined;
       return undefined;
@@ -39,29 +44,29 @@ const useTransition = opts => {
 
     const duration =
       typeof startedAt.current === "undefined"
-        ? opts.timeout
+        ? timeout
         : Math.max(0, Date.now() - startedAt.current);
     const now = Date.now();
 
-    if (!onoff && (state === "entered" || state === "entering")) {
+    if (!isActive && (state === "entered" || state === "entering")) {
       setState("exiting");
-      timeout.current = setTimeout(timeout1, duration);
+      timeoutRef.current = setTimeout(timeout1, duration);
       startedAt.current = now;
-    } else if (onoff && (state === "exited" || state === "exiting")) {
+    } else if (isActive && (state === "exited" || state === "exiting")) {
       setState("entering");
-      timeout.current = setTimeout(timeout2, duration);
+      timeoutRef.current = setTimeout(timeout2, duration);
       startedAt.current = now;
     } else {
-      setState(onoff ? "exited" : "entered");
-      timeout.current = setTimeout(timeout4, 30);
+      setState(isActive ? "exited" : "entered");
+      timeoutRef.current = setTimeout(timeout4, 30);
       startedAt.current = undefined;
     }
     return () => {
-      clearTimeout(timeout.current);
+      clearTimeout(timeoutRef.current);
     };
-  }, [onoff]);
+  }, [isActive]);
 
-  return [state, onoff, toggleOnOff];
+  return state;
 };
 
 export default useTransition;
