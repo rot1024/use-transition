@@ -1,0 +1,23 @@
+{
+  "name": "@rot1024/use-transition",
+  "version": "1.0.0",
+  "description": "React Hooks for transition animation like Transition component in react-transition-group",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "repository": "https://github.com/rot1024/use-transition.git",
+  "author": "rot1024 <aayhrot@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "eslint ."
+  },
+  "peerDependencies": {
+    "react": ">=16.8"
+  },
+  "devDependencies": {
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "^1.18.2"
+  }
+}
