@@ -12,25 +12,25 @@ export const useTransition = (isActive, timeout, opts) => {
       isActive ? "entered" : opts && opts.unmountOnExit ? "unmounted" : "exited"
     );
     willFinishAt.current = undefined;
-  }, [isActive]);
+  }, [isActive, !!opts && opts.unmountOnExit, willFinishAt]);
 
   const timeout2 = useCallback(() => {
     setState("entered");
     willFinishAt.current = undefined;
-  }, []);
+  }, [willFinishAt]);
 
   const timeout3 = useCallback(() => {
     setState(
       isActive ? "entered" : opts && opts.unmountOnExit ? "unmounted" : "exited"
     );
     willFinishAt.current = undefined;
-  }, [isActive, !!opts && opts.unmountOnExit]);
+  }, [isActive, !!opts && opts.unmountOnExit, willFinishAt]);
 
   const timeout4 = useCallback(() => {
     setState(isActive ? "entering" : "exiting");
     timeoutRef.current = setTimeout(timeout3, timeout);
     willFinishAt.current = Date.now() + timeout;
-  }, [isActive, timeout, timeout3]);
+  }, [isActive, timeout, timeout3, timeoutRef, willFinishAt]);
 
   useEffect(() => {
     if (
@@ -46,9 +46,7 @@ export const useTransition = (isActive, timeout, opts) => {
     const duration =
       typeof willFinishAt.current === "undefined"
         ? timeout
-        : isActive
-        ? willFinishAt - now
-        : timeout - (willFinishAt - now);
+        : timeout - (willFinishAt.current - now);
 
     if (!isActive && (state === "entered" || state === "entering")) {
       setState("exiting");
