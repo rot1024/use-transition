@@ -42,25 +42,24 @@ export const useTransition = (isActive, timeout, opts) => {
       return undefined;
     }
 
+    const now = Date.now();
     const duration =
       typeof startedAt.current === "undefined"
         ? timeout
-        : Math.max(0, Date.now() - startedAt.current);
-    const now = Date.now();
+        : Math.max(0, now - startedAt.current);
 
     if (!isActive && (state === "entered" || state === "entering")) {
       setState("exiting");
       timeoutRef.current = setTimeout(timeout1, duration);
-      startedAt.current = now;
     } else if (isActive && (state === "exited" || state === "exiting")) {
       setState("entering");
       timeoutRef.current = setTimeout(timeout2, duration);
-      startedAt.current = now;
     } else {
       setState(isActive ? "exited" : "entered");
       timeoutRef.current = setTimeout(timeout4, 30);
-      startedAt.current = undefined;
     }
+    startedAt.current = now;
+
     return () => {
       clearTimeout(timeoutRef.current);
     };
