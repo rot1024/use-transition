@@ -37,7 +37,7 @@ const useTransition = opts => {
       return undefined;
     }
 
-    const timeout =
+    const duration =
       typeof startedAt.current === "undefined"
         ? opts.timeout
         : Math.max(0, Date.now() - startedAt.current);
@@ -45,11 +45,11 @@ const useTransition = opts => {
 
     if (!onoff && (state === "entered" || state === "entering")) {
       setState("exiting");
-      timeout.current = setTimeout(timeout1, timeout);
+      timeout.current = setTimeout(timeout1, duration);
       startedAt.current = now;
     } else if (onoff && (state === "exited" || state === "exiting")) {
       setState("entering");
-      timeout.current = setTimeout(timeout2, timeout);
+      timeout.current = setTimeout(timeout2, duration);
       startedAt.current = now;
     } else {
       setState(onoff ? "exited" : "entered");
