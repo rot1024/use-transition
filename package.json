@@ -11,6 +11,10 @@
   "scripts": {
     "test": "eslint ."
   },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
   "peerDependencies": {
     "react": ">=16.8"
   },
